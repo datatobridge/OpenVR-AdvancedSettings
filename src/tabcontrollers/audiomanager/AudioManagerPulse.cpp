@@ -1,4 +1,6 @@
+#include <easylogging++.h>
 #include "AudioManagerPulse.h"
+#include "AudioManagerPulse_internal.h"
 
 // Used to get the compiler to shut up about C4100: unreferenced formal
 // parameter. The cast is to get GCC to shut up about it.
@@ -7,124 +9,130 @@
 // application namespace
 namespace advsettings
 {
-void AudioManagerDummy::init( AudioTabController* controller )
+AudioManagerPulse::~AudioManagerPulse()
+{
+    // Restore state
+}
+
+void AudioManagerPulse::init( AudioTabController* controller )
 {
     m_controller = controller;
+
+    initializePulseAudio();
 }
 
-void AudioManagerDummy::setPlaybackDevice( const std::string& id, bool notify )
+void AudioManagerPulse::setPlaybackDevice( const std::string& id, bool notify )
 {
     // noop
     UNREFERENCED_PARAMETER( id );
     UNREFERENCED_PARAMETER( notify );
 }
 
-std::string AudioManagerDummy::getPlaybackDevName()
+std::string AudioManagerPulse::getPlaybackDevName()
 {
-    return "dummy";
+    return getCurrentDefaultPlaybackDeviceName();
 }
 
-std::string AudioManagerDummy::getPlaybackDevId()
+std::string AudioManagerPulse::getPlaybackDevId()
 {
-    return "dummy";
+    return getCurrentDefaultPlaybackDeviceId();
 }
 
-void AudioManagerDummy::setMirrorDevice( const std::string& id, bool notify )
+void AudioManagerPulse::setMirrorDevice( const std::string& id, bool notify )
 {
     // noop
     UNREFERENCED_PARAMETER( id );
     UNREFERENCED_PARAMETER( notify );
 }
 
-bool AudioManagerDummy::isMirrorValid()
+bool AudioManagerPulse::isMirrorValid()
 {
     return false;
 }
 
-std::string AudioManagerDummy::getMirrorDevName()
+std::string AudioManagerPulse::getMirrorDevName()
 {
     return "dummy";
 }
 
-std::string AudioManagerDummy::getMirrorDevId()
+std::string AudioManagerPulse::getMirrorDevId()
 {
     return "dummy";
 }
 
-float AudioManagerDummy::getMirrorVolume()
+float AudioManagerPulse::getMirrorVolume()
 {
     return 0;
 }
 
-bool AudioManagerDummy::setMirrorVolume( float value )
+bool AudioManagerPulse::setMirrorVolume( float value )
 {
     UNREFERENCED_PARAMETER( value );
     return false;
 }
 
-bool AudioManagerDummy::getMirrorMuted()
+bool AudioManagerPulse::getMirrorMuted()
 {
     return true;
 }
 
-bool AudioManagerDummy::setMirrorMuted( bool value )
+bool AudioManagerPulse::setMirrorMuted( bool value )
 {
     UNREFERENCED_PARAMETER( value );
     return false;
 }
 
-bool AudioManagerDummy::isMicValid()
+bool AudioManagerPulse::isMicValid()
 {
     return false;
 }
 
-void AudioManagerDummy::setMicDevice( const std::string& id, bool notify )
+void AudioManagerPulse::setMicDevice( const std::string& id, bool notify )
 {
     // noop
     UNREFERENCED_PARAMETER( id );
     UNREFERENCED_PARAMETER( notify );
 }
 
-std::string AudioManagerDummy::getMicDevName()
+std::string AudioManagerPulse::getMicDevName()
 {
-    return "dummy";
+    return getCurrentDefaultRecordingDeviceName();
 }
 
-std::string AudioManagerDummy::getMicDevId()
+std::string AudioManagerPulse::getMicDevId()
 {
-    return "dummy";
+    return getCurrentDefaultRecordingDeviceId();
 }
 
-float AudioManagerDummy::getMicVolume()
+float AudioManagerPulse::getMicVolume()
 {
-    return 0;
+    return getMicrophoneVolume();
 }
 
-bool AudioManagerDummy::setMicVolume( float value )
+bool AudioManagerPulse::setMicVolume( float value )
 {
     UNREFERENCED_PARAMETER( value );
     return false;
 }
 
-bool AudioManagerDummy::getMicMuted()
+bool AudioManagerPulse::getMicMuted()
 {
-    return true;
+    return getMicrophoneMuted();
 }
 
-bool AudioManagerDummy::setMicMuted( bool value )
+bool AudioManagerPulse::setMicMuted( bool value )
 {
-    UNREFERENCED_PARAMETER( value );
-    return false;
+    return setMicMuteState( value );
 }
 
-std::vector<AudioDevice> AudioManagerDummy::getRecordingDevices()
+std::vector<AudioDevice> AudioManagerPulse::getRecordingDevices()
 {
-    return {};
+    return returnRecordingDevices();
 }
 
-std::vector<AudioDevice> AudioManagerDummy::getPlaybackDevices()
+std::vector<AudioDevice> AudioManagerPulse::getPlaybackDevices()
 {
-    return {};
+    return returnPlaybackDevices();
 }
 
 } // namespace advsettings

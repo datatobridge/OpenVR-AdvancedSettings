@@ -1,13 +1,15 @@
 #pragma once
 
 #include "AudioManager.h"
+#include <pulse/pulseaudio.h>
 
 namespace advsettings
 {
-class AudioManagerDummy : public AudioManager
+class AudioManagerPulse : public AudioManager
 {
 public:
     virtual void init( AudioTabController* controller ) override;
+    ~AudioManagerPulse() override;
 
     virtual void setPlaybackDevice( const std::string& id,
                                     bool notify = true ) override;
@@ -39,6 +41,7 @@ public:
 
 private:
     AudioTabController* m_controller;
+
 };
 
 } // namespace advsettings

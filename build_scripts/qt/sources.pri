@@ -88,7 +88,8 @@ unix:!macx {
     !noPulse {
         message(PulseAudio features enabled.)
         SOURCES += src/tabcontrollers/audiomanager/AudioManagerPulse.cpp
-        HEADERS += src/tabcontrollers/audiomanager/AudioManagerPulse.h
+        HEADERS += src/tabcontrollers/audiomanager/AudioManagerPulse.h \
+            src/tabcontrollers/audiomanager/AudioManagerPulse_internal.h
         LIBS += -lpulse
     }
     else {

@@ -1,11 +1,44 @@
 #include "utils/setup.h"
 #include "settings/settings.h"
+#include "tabcontrollers/audiomanager/AudioManagerPulse.h"
 
 INITIALIZE_EASYLOGGINGPP
 
 int main( int argc, char* argv[] )
 {
     setUpLogging();
+
+    advsettings::AudioManagerPulse p;
+    p.init(nullptr);
+    LOG(INFO) << "MAIN: ";
+    LOG( INFO ) << p.getPlaybackDevName();
+    LOG( INFO ) << p.getPlaybackDevId();
+
+    LOG( INFO ) << p.getMicDevName();
+    LOG( INFO ) << p.getMicDevId();
+
+    LOG( INFO ) << "Playback devices:";
+    const auto playback = p.getPlaybackDevices();
+    for ( const auto& dev : playback )
+    {
+        LOG( INFO ) << "\t" << dev.name();
+        LOG( INFO ) << "\t" << dev.id();
+    }
+
+    LOG( INFO ) << "Recording devices:";
+    const auto recording = p.getRecordingDevices();
+    for ( const auto& dev : playback )
+    {
+        LOG( INFO ) << "\t" << dev.name();
+        LOG( INFO ) << "\t" << dev.id();
+    }
+
+    LOG( INFO ) << "Mic mute status: " << p.getMicMuted();
+    LOG( INFO ) << "Set mic mute: " << p.setMicMuted( true );
+    LOG( INFO ) << "Mic mute status: " << p.getMicMuted();
+    LOG( INFO ) << "Set mic mute: " << p.setMicMuted( false );
+
+    exit( 0 );
 
     LOG( INFO ) << "Settings File: "
                 << settings::initializeAndGetSettingsPath();
