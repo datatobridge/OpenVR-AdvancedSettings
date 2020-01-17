@@ -334,6 +334,7 @@ The following values can be appended to the `CONFIG` internal variable in order 
 | ----- | ------- |
 | `noX11` | Disables X11 specific features (VR to keyboard input). |
 | `noDBUS` | Disables DBUS specific features (control media players). |
+| `noPulse` | Disables PulseAudio specific features (change audio devices). |
 | `debugSymbolsAndLogs` | Enables debug symbols and debug logging calls (while still having release optimizations). |
 
 The values are case sensitive.
@@ -346,6 +347,11 @@ qmake CONFIG+=noX11
 If you want to disable both X11 and DBUS features you would type
 ```bash
 qmake CONFIG+=noX11 CONFIG+=noDBUS
+```
+
+If you want to disable X11, DBUS and PulseAudio features you would type
+```bash
+qmake CONFIG+=noX11 CONFIG+=noDBUS CONFIG+=noPulse
 ```
 
 The location for `make install` can be configured in the `qmake` step.
