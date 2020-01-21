@@ -38,6 +38,9 @@ struct
     std::string originalDefaultOutputDeviceId;
     std::string originalDefaultInputDeviceId;
 
+    float originalDefaultOutputDeviceVolume;
+    float originalDefaultInputDeviceVolume;
+
     std::vector<AudioDevice> sinkOutputDevices;
     std::vector<AudioDevice> sourceInputDevices;
 
@@ -122,6 +125,11 @@ std::string getDeviceName( pa_proplist* p )
 
 template <class T> void deviceCallback( const T* i, const int isLast )
 {
+    static_assert(
+        std::is_same<pa_source_info, T>::value
+            || std::is_same<pa_sink_info, T>::value,
+        "Function should only be used with pa_source_info or pa_sink_info." );
+
     const auto deviceState = getIsLastMeaning( isLast );
     if ( deviceState == PulseAudioIsLastMeaning::PreviousDeviceWasLastReal )
     {
@@ -258,6 +266,29 @@ void updateAllPulseData()
     customPulseLoop();
 }
 
+void setPlaybackCallback( pa_context* c, int success, void* userdata )
+{
+    UNREFERENCED_PARAMETER( c );
+    UNREFERENCED_PARAMETER( userdata );
+
+    if ( !success )
+    {
+        LOG( ERROR ) << "Error setting mic volume status.";
+    }
+
+    loopControl = PulseAudioLoopControl::Stop;
+}
+
+void setPlaybackDeviceInternal( const std::string& id )
+{
+    updateAllPulseData();
+
+    pa_context_set_default_sink(
+        pulseAudioPointers.context, id.c_str(), setPlaybackCallback, nullptr );
+
+    customPulseLoop();
+}
+
 std::string getCurrentDefaultPlaybackDeviceName()
 {
     updateAllPulseData();
@@ -318,12 +349,21 @@ std::vector<AudioDevice> returnPlaybackDevices()
     return pulseAudioData.sinkOutputDevices;
 }
 
+bool isMicrophoneValid()
+{
+    updateAllPulseData();
+
+    return pulseAudioData.defaultSourceInputDeviceId == "";
+}
+
 float getMicrophoneVolume()
 {
     updateAllPulseData();
 
-    return static_cast<float>(
-        pulseAudioData.currentDefaultSourceInfo.volume.values[0] );
+    const auto linearVolume = pa_sw_volume_to_linear(
+        pa_cvolume_avg( &pulseAudioData.currentDefaultSourceInfo.volume ) );
+
+    return static_cast<float>( linearVolume );
 }
 
 bool getMicrophoneMuted()
@@ -331,6 +371,69 @@ bool getMicrophoneMuted()
     updateAllPulseData();
 
     return pulseAudioData.currentDefaultSourceInfo.mute;
+}
+
+void setMicrophoneCallback( pa_context* c, int success, void* userdata )
+{
+    UNREFERENCED_PARAMETER( c );
+    UNREFERENCED_PARAMETER( userdata );
+
+    if ( !success )
+    {
+        LOG( ERROR ) << "Error setting mic volume status.";
+    }
+
+    loopControl = PulseAudioLoopControl::Stop;
+}
+
+void setMicrophoneDevice( const std::string& id )
+{
+    updateAllPulseData();
+
+    pa_context_set_default_source( pulseAudioPointers.context,
+                                   id.c_str(),
+                                   setMicrophoneCallback,
+                                   nullptr );
+
+    customPulseLoop();
+}
+
+void setMicVolumeCallback( pa_context* c, int success, void* userdata )
+{
+    UNREFERENCED_PARAMETER( c );
+
+    if ( success )
+    {
+        *static_cast<bool*>( userdata ) = true;
+    }
+    else
+    {
+        LOG( ERROR ) << "Error setting mic volume status.";
+    }
+
+    loopControl = PulseAudioLoopControl::Stop;
+}
+
+bool setMicrophoneVolume( const float volume )
+{
+    updateAllPulseData();
+
+    auto pulseVolume = pulseAudioData.currentDefaultSourceInfo.volume;
+    const auto vol = pa_sw_volume_from_linear( volume );
+
+    pa_cvolume_set( &pulseVolume, pulseVolume.channels, vol );
+
+    auto success = false;
+    pa_context_set_source_volume_by_name(
+        pulseAudioPointers.context,
+        pulseAudioData.defaultSourceInputDeviceId.c_str(),
+        &pulseVolume,
+        setMicVolumeCallback,
+        &success );
+
+    customPulseLoop();
+
+    return success;
 }
 
 void micMuteStatusCallback( pa_context* c, int success, void* userdata )
@@ -361,8 +464,15 @@ bool setMicMuteState( const bool muted )
 
     customPulseLoop();
 
-    LOG( INFO ) << "success: " << success;
     return success;
+}
+
+void restorePulseAudioState()
+{
+    setPlaybackDeviceInternal( pulseAudioData.originalDefaultOutputDeviceId );
+
+    setMicrophoneDevice( pulseAudioData.originalDefaultInputDeviceId );
+    setMicrophoneVolume( pulseAudioData.originalDefaultInputDeviceVolume );
 }
 
 void initializePulseAudio()
@@ -388,7 +498,14 @@ void initializePulseAudio()
 
     pulseAudioData.originalDefaultInputDeviceId
         = getCurrentDefaultRecordingDeviceId();
+
+    pulseAudioData.originalDefaultInputDeviceVolume = pa_sw_volume_to_linear(
+        pa_cvolume_avg( &pulseAudioData.currentDefaultSourceInfo.volume ) );
+
     pulseAudioData.originalDefaultOutputDeviceId
         = getCurrentDefaultPlaybackDeviceId();
+
+    pulseAudioData.originalDefaultOutputDeviceVolume = pa_sw_volume_to_linear(
+        pa_cvolume_avg( &pulseAudioData.currentDefaultSinkInfo.volume ) );
 }
 } // namespace advsettings

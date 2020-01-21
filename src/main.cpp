@@ -38,6 +38,12 @@ int main( int argc, char* argv[] )
     LOG( INFO ) << "Mic mute status: " << p.getMicMuted();
     LOG( INFO ) << "Set mic mute: " << p.setMicMuted( false );
 
+    LOG( INFO ) << "MIC:";
+    LOG( INFO ) << "Mic vol: " << p.getMicVolume();
+    LOG( INFO ) << "set Mic vol: " << p.setMicVolume( 0.5 );
+    LOG( INFO ) << "Mic vol: " << p.getMicVolume();
+    LOG( INFO ) << "set Mic vol: " << p.setMicVolume( 1.0 );
+
     exit( 0 );
 
     LOG( INFO ) << "Settings File: "

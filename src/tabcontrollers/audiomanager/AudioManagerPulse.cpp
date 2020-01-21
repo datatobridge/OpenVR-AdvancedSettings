@@ -1,6 +1,7 @@
 #include <easylogging++.h>
 #include "AudioManagerPulse.h"
 #include "AudioManagerPulse_internal.h"
+#include "../AudioTabController.h"
 
 // Used to get the compiler to shut up about C4100: unreferenced formal
 // parameter. The cast is to get GCC to shut up about it.
@@ -11,7 +12,7 @@ namespace advsettings
 {
 AudioManagerPulse::~AudioManagerPulse()
 {
-    // Restore state
+    restorePulseAudioState();
 }
 
 void AudioManagerPulse::init( AudioTabController* controller )
@@ -23,9 +24,12 @@ void AudioManagerPulse::init( AudioTabController* controller )
 
 void AudioManagerPulse::setPlaybackDevice( const std::string& id, bool notify )
 {
-    // noop
-    UNREFERENCED_PARAMETER( id );
-    UNREFERENCED_PARAMETER( notify );
+    setPlaybackDeviceInternal( id );
+
+    if ( notify )
+    {
+        m_controller->onNewPlaybackDevice();
+    }
 }
 
 std::string AudioManagerPulse::getPlaybackDevName()
@@ -84,14 +88,17 @@ bool AudioManagerPulse::setMirrorMuted( bool value )
 
 bool AudioManagerPulse::isMicValid()
 {
-    return false;
+    return isMicrophoneValid();
 }
 
 void AudioManagerPulse::setMicDevice( const std::string& id, bool notify )
 {
-    // noop
-    UNREFERENCED_PARAMETER( id );
-    UNREFERENCED_PARAMETER( notify );
+    setMicrophoneDevice( id );
+
+    if ( notify )
+    {
+        m_controller->onNewRecordingDevice();
+    }
 }
 
 std::string AudioManagerPulse::getMicDevName()
@@ -111,8 +118,16 @@ float AudioManagerPulse::getMicVolume()
 
 bool AudioManagerPulse::setMicVolume( float value )
 {
-    UNREFERENCED_PARAMETER( value );
-    return false;
+    if ( value > 1.0f )
+    {
+        value = 1.0f;
+    }
+    else if ( value < 0.0f )
+    {
+        value = 0.0f;
+    }
+
+    return setMicrophoneVolume( value );
 }
 
 bool AudioManagerPulse::getMicMuted()
