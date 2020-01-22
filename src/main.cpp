@@ -8,8 +8,6 @@ int main( int argc, char* argv[] )
 {
     setUpLogging();
 
-    exit( 0 );
-
     LOG( INFO ) << "Settings File: "
                 << settings::initializeAndGetSettingsPath();
 
