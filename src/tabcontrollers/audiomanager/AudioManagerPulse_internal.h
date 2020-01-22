@@ -398,6 +398,44 @@ void setMicrophoneDevice( const std::string& id )
     customPulseLoop();
 }
 
+void setPlaybackVolumeCallback( pa_context* c, int success, void* userdata )
+{
+    UNREFERENCED_PARAMETER( c );
+
+    if ( success )
+    {
+        *static_cast<bool*>( userdata ) = true;
+    }
+    else
+    {
+        LOG( ERROR ) << "Error setting playback volume status.";
+    }
+
+    loopControl = PulseAudioLoopControl::Stop;
+}
+
+bool setPlaybackVolume( const float volume )
+{
+    updateAllPulseData();
+
+    auto pulseVolume = pulseAudioData.currentDefaultSinkInfo.volume;
+    const auto vol = pa_sw_volume_from_linear( volume );
+
+    pa_cvolume_set( &pulseVolume, pulseVolume.channels, vol );
+
+    auto success = false;
+    pa_context_set_sink_volume_by_name(
+        pulseAudioPointers.context,
+        pulseAudioData.defaultSinkOutputDeviceId.c_str(),
+        &pulseVolume,
+        setPlaybackVolumeCallback,
+        &success );
+
+    customPulseLoop();
+
+    return success;
+}
+
 void setMicVolumeCallback( pa_context* c, int success, void* userdata )
 {
     UNREFERENCED_PARAMETER( c );
@@ -470,6 +508,7 @@ bool setMicMuteState( const bool muted )
 void restorePulseAudioState()
 {
     setPlaybackDeviceInternal( pulseAudioData.originalDefaultOutputDeviceId );
+    setPlaybackVolume( pulseAudioData.originalDefaultOutputDeviceVolume );
 
     setMicrophoneDevice( pulseAudioData.originalDefaultInputDeviceId );
     setMicrophoneVolume( pulseAudioData.originalDefaultInputDeviceVolume );
@@ -499,13 +538,15 @@ void initializePulseAudio()
     pulseAudioData.originalDefaultInputDeviceId
         = getCurrentDefaultRecordingDeviceId();
 
-    pulseAudioData.originalDefaultInputDeviceVolume = pa_sw_volume_to_linear(
-        pa_cvolume_avg( &pulseAudioData.currentDefaultSourceInfo.volume ) );
+    pulseAudioData.originalDefaultInputDeviceVolume
+        = static_cast<float>( pa_sw_volume_to_linear( pa_cvolume_avg(
+            &pulseAudioData.currentDefaultSourceInfo.volume ) ) );
 
     pulseAudioData.originalDefaultOutputDeviceId
         = getCurrentDefaultPlaybackDeviceId();
 
-    pulseAudioData.originalDefaultOutputDeviceVolume = pa_sw_volume_to_linear(
-        pa_cvolume_avg( &pulseAudioData.currentDefaultSinkInfo.volume ) );
+    pulseAudioData.originalDefaultOutputDeviceVolume
+        = static_cast<float>( pa_sw_volume_to_linear(
+            pa_cvolume_avg( &pulseAudioData.currentDefaultSinkInfo.volume ) ) );
 }
 } // namespace advsettings
