@@ -7,7 +7,7 @@
 #ifdef _WIN32
 #    include "audiomanager/AudioManagerWindows.h"
 #elif __linux__
-#	 include "audiomanager/AudioManagerPulse.h"
+#    include "audiomanager/AudioManagerPulse.h"
 #else
 #    include "audiomanager/AudioManagerDummy.h"
 #endif

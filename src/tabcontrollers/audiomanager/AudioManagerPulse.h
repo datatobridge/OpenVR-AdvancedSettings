@@ -41,7 +41,6 @@ public:
 
 private:
     AudioTabController* m_controller;
-
 };
 
 } // namespace advsettings
