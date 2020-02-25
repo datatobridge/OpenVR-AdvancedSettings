@@ -118,8 +118,6 @@ unix {
     INSTALLS += application
 }
 
-debugSymbolsAndLogs {
-    message(Debug symbols and logging enabled.)
-    CONFIG += force_debug_info
-    DEFINES += ENABLE_DEBUG_LOGGING
-}
+message(Debug symbols and logging enabled.)
+CONFIG += force_debug_info
+DEFINES += ENABLE_DEBUG_LOGGING
