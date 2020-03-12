@@ -1,6 +1,5 @@
 #include "utils/setup.h"
 #include "settings/settings.h"
-#include "tabcontrollers/audiomanager/AudioManagerPulse.h"
 
 INITIALIZE_EASYLOGGINGPP
 
