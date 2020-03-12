@@ -56,7 +56,7 @@ update_and_install_prereqs: &update_and_install_prereqs
         command: apt-get install libx11-dev libxt-dev libxtst-dev -y
     - run:
         name: Install pulse packages
-        command: sudo apt-get install libpulse-dev -y
+        command: apt-get install libpulse-dev -y
     - run:
         name: Install bear/clang-tidy
         command: apt-get install bear clang-tidy -y
