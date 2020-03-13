@@ -418,7 +418,7 @@ bool isMicrophoneValid()
 
     updateAllPulseData();
 
-    return pulseAudioData.defaultSourceInputDeviceId == "";
+    const auto valid = pulseAudioData.defaultSourceInputDeviceId != "";
 
     LOG( DEBUG ) << "isMicrophoneValid done.";
 }
