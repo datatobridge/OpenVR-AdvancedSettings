@@ -88,7 +88,6 @@ void dumpPulseAudioState()
 
 PulseAudioIsLastMeaning getIsLastMeaning( const int isLast ) noexcept
 {
-
     if ( isLast < 0 )
     {
         LOG( ERROR ) << "Error in isLast.";
@@ -106,7 +105,6 @@ PulseAudioIsLastMeaning getIsLastMeaning( const int isLast ) noexcept
 
 std::string getDeviceName( pa_proplist* p )
 {
-
     if ( !p )
     {
         LOG( ERROR ) << "proplist not valid.";
@@ -191,19 +189,16 @@ void setOutputDevicesCallback( pa_context* c,
                                int isLast,
                                void* userdata )
 {
-
     UNREFERENCED_PARAMETER( userdata );
     UNREFERENCED_PARAMETER( c );
 
     deviceCallback( i, isLast );
-
 }
 
 void getDefaultDevicesCallback( pa_context* c,
                                 const pa_server_info* i,
                                 void* userdata )
 {
-
     UNREFERENCED_PARAMETER( c );
     UNREFERENCED_PARAMETER( userdata );
 
@@ -229,7 +224,6 @@ void getDefaultDevicesCallback( pa_context* c,
 
 void stateCallbackFunction( pa_context* c, void* userdata )
 {
-
     UNREFERENCED_PARAMETER( c );
     UNREFERENCED_PARAMETER( userdata );
 
@@ -298,12 +292,10 @@ void setPlaybackCallback( pa_context* c, int success, void* userdata )
     }
 
     loopControl = PulseAudioLoopControl::Stop;
-
 }
 
 void setPlaybackDeviceInternal( const std::string& id )
 {
-
     updateAllPulseData();
 
     pa_context_set_default_sink(
@@ -316,7 +308,6 @@ void setPlaybackDeviceInternal( const std::string& id )
 
 std::string getCurrentDefaultPlaybackDeviceName()
 {
-
     updateAllPulseData();
 
     for ( const auto& dev : pulseAudioData.sinkOutputDevices )
@@ -345,7 +336,6 @@ std::string getCurrentDefaultPlaybackDeviceId()
 
 std::string getCurrentDefaultRecordingDeviceName()
 {
-
     updateAllPulseData();
 
     for ( const auto& dev : pulseAudioData.sourceInputDevices )
@@ -364,7 +354,6 @@ std::string getCurrentDefaultRecordingDeviceName()
 
 std::string getCurrentDefaultRecordingDeviceId()
 {
-
     updateAllPulseData();
 
     return pulseAudioData.defaultSourceInputDeviceId;
@@ -375,7 +364,6 @@ std::string getCurrentDefaultRecordingDeviceId()
 
 std::vector<AudioDevice> returnRecordingDevices()
 {
-
     updateAllPulseData();
 
     return pulseAudioData.sourceInputDevices;
@@ -401,7 +389,6 @@ bool isMicrophoneValid()
 
 float getMicrophoneVolume()
 {
-
     updateAllPulseData();
 
     const auto linearVolume = pa_sw_volume_to_linear(
@@ -410,7 +397,6 @@ float getMicrophoneVolume()
     LOG( DEBUG ) << "getMicrophoneVolume done with: " << linearVolume;
 
     return static_cast<float>( linearVolume );
-
 }
 
 bool getMicrophoneMuted()
@@ -421,7 +407,6 @@ bool getMicrophoneMuted()
                  << pulseAudioData.currentDefaultSourceInfo.mute;
 
     return pulseAudioData.currentDefaultSourceInfo.mute;
-
 }
 
 void setMicrophoneCallback( pa_context* c, int success, void* userdata )
