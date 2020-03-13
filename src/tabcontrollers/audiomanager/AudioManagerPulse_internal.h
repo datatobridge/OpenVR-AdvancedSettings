@@ -48,7 +48,7 @@ struct
     pa_source_info currentDefaultSourceInfo;
 } pulseAudioData;
 
-PulseAudioLoopControl loopControl = PulseAudioLoopControl::Run;
+static PulseAudioLoopControl loopControl = PulseAudioLoopControl::Run;
 
 void customPulseLoop()
 {
@@ -485,7 +485,7 @@ bool setPlaybackVolume( const float volume )
     updateAllPulseData();
 
     auto pulseVolume = pulseAudioData.currentDefaultSinkInfo.volume;
-    const auto vol = pa_sw_volume_from_linear( volume );
+    const auto vol = pa_sw_volume_from_linear( static_cast<double>( volume ) );
 
     pa_cvolume_set( &pulseVolume, pulseVolume.channels, vol );
 
@@ -531,7 +531,7 @@ bool setMicrophoneVolume( const float volume )
     updateAllPulseData();
 
     auto pulseVolume = pulseAudioData.currentDefaultSourceInfo.volume;
-    const auto vol = pa_sw_volume_from_linear( volume );
+    const auto vol = pa_sw_volume_from_linear( static_cast<double>( volume ) );
 
     pa_cvolume_set( &pulseVolume, pulseVolume.channels, vol );
 
