@@ -426,6 +426,47 @@ void setMicrophoneCallback( pa_context* c, int success, void* userdata )
     LOG( DEBUG ) << "setMicrophoneCallback done.";
 }
 
+void setSourceOutputCallback( pa_context* c, int success, void* userdata )
+{
+    LOG( DEBUG ) << "setSourceOutputCallback called with succes: " << success;
+
+    UNREFERENCED_PARAMETER( c );
+    UNREFERENCED_PARAMETER( userdata );
+
+    if ( !success )
+    {
+        LOG( ERROR ) << "Error setting source output..";
+    }
+
+    loopControl = PulseAudioLoopControl::Stop;
+}
+
+void sourceOutputCallback( pa_context* c,
+                           const pa_source_output_info* i,
+                           int isLast,
+                           void* userdata )
+{
+    UNREFERENCED_PARAMETER( userdata );
+
+    const auto deviceState = getIsLastMeaning( isLast );
+    if ( deviceState == PulseAudioIsLastMeaning::PreviousDeviceWasLastReal )
+    {
+        loopControl = PulseAudioLoopControl::Stop;
+        return;
+    }
+    else if ( deviceState == PulseAudioIsLastMeaning::Error )
+    {
+        LOG( ERROR ) << "Error in sourceOutputCallback function.";
+        dumpPulseAudioState();
+        return;
+    }
+
+    const auto sourceOutputIndex = i->index;
+    const auto sourceIndex = pulseAudioData.currentDefaultSourceInfo.index;
+    pa_context_move_source_output_by_index(
+        c, sourceIndex, sourceOutputIndex, setSourceOutputCallback, nullptr );
+}
+
 void setMicrophoneDevice( const std::string& id )
 {
     LOG( DEBUG ) << "setMicrophoneDevice called with 'id': " << id;
@@ -436,6 +477,12 @@ void setMicrophoneDevice( const std::string& id )
                                    id.c_str(),
                                    setMicrophoneCallback,
                                    nullptr );
+
+    customPulseLoop();
+
+    constexpr auto noUserData = nullptr;
+    pa_context_get_source_output_info_list(
+        pulseAudioPointers.context, sourceOutputCallback, noUserData );
 
     customPulseLoop();
 
