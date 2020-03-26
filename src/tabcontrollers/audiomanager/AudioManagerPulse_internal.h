@@ -279,16 +279,22 @@ void updateAllPulseData()
     LOG( DEBUG ) << "updateAllPulseData done.";
 }
 
-void setPlaybackCallback( pa_context* c, int success, void* userdata )
+void successCallback( pa_context* c, int success, void* successVariable )
 {
-    LOG( DEBUG ) << "setPlaybackCallback called with succes: " << success;
-
     UNREFERENCED_PARAMETER( c );
-    UNREFERENCED_PARAMETER( userdata );
 
-    if ( !success )
+    if ( success )
     {
-        LOG( ERROR ) << "Error setting mic volume status.";
+        if ( successVariable != nullptr )
+        {
+            // Some functions don't need a return value
+            *static_cast<bool*>( successVariable ) = true;
+        }
+    }
+    else
+    {
+        LOG( ERROR ) << "Non successful callback operation.";
+        dumpPulseAudioState();
     }
 
     loopControl = PulseAudioLoopControl::Stop;
@@ -299,7 +305,7 @@ void setPlaybackDeviceInternal( const std::string& id )
     updateAllPulseData();
 
     pa_context_set_default_sink(
-        pulseAudioPointers.context, id.c_str(), setPlaybackCallback, nullptr );
+        pulseAudioPointers.context, id.c_str(), successCallback, nullptr );
 
     customPulseLoop();
 
@@ -409,38 +415,6 @@ bool getMicrophoneMuted()
     return pulseAudioData.currentDefaultSourceInfo.mute;
 }
 
-void setMicrophoneCallback( pa_context* c, int success, void* userdata )
-{
-    LOG( DEBUG ) << "setMicrophoneCallback called with 'success': " << success;
-
-    UNREFERENCED_PARAMETER( c );
-    UNREFERENCED_PARAMETER( userdata );
-
-    if ( !success )
-    {
-        LOG( ERROR ) << "Error setting mic volume status.";
-    }
-
-    loopControl = PulseAudioLoopControl::Stop;
-
-    LOG( DEBUG ) << "setMicrophoneCallback done.";
-}
-
-void setSourceOutputCallback( pa_context* c, int success, void* userdata )
-{
-    LOG( DEBUG ) << "setSourceOutputCallback called with succes: " << success;
-
-    UNREFERENCED_PARAMETER( c );
-    UNREFERENCED_PARAMETER( userdata );
-
-    if ( !success )
-    {
-        LOG( ERROR ) << "Error setting source output..";
-    }
-
-    loopControl = PulseAudioLoopControl::Stop;
-}
-
 void sourceOutputCallback( pa_context* c,
                            const pa_source_output_info* i,
                            int isLast,
@@ -464,7 +438,7 @@ void sourceOutputCallback( pa_context* c,
     const auto sourceOutputIndex = i->index;
     const auto sourceIndex = pulseAudioData.currentDefaultSourceInfo.index;
     pa_context_move_source_output_by_index(
-        c, sourceIndex, sourceOutputIndex, setSourceOutputCallback, nullptr );
+        c, sourceIndex, sourceOutputIndex, successCallback, nullptr );
 }
 
 void setMicrophoneDevice( const std::string& id )
@@ -473,10 +447,8 @@ void setMicrophoneDevice( const std::string& id )
 
     updateAllPulseData();
 
-    pa_context_set_default_source( pulseAudioPointers.context,
-                                   id.c_str(),
-                                   setMicrophoneCallback,
-                                   nullptr );
+    pa_context_set_default_source(
+        pulseAudioPointers.context, id.c_str(), successCallback, nullptr );
 
     customPulseLoop();
 
@@ -487,27 +459,6 @@ void setMicrophoneDevice( const std::string& id )
     customPulseLoop();
 
     LOG( DEBUG ) << "setMicrophoneDevice done.";
-}
-
-void setPlaybackVolumeCallback( pa_context* c, int success, void* userdata )
-{
-    LOG( DEBUG ) << "setPlaybackVolumeCallback called with 'success': "
-                 << success;
-
-    UNREFERENCED_PARAMETER( c );
-
-    if ( success )
-    {
-        *static_cast<bool*>( userdata ) = true;
-    }
-    else
-    {
-        LOG( ERROR ) << "Error setting playback volume status.";
-    }
-
-    loopControl = PulseAudioLoopControl::Stop;
-
-    LOG( DEBUG ) << "setPlaybackVolumeCallback done.";
 }
 
 bool setPlaybackVolume( const float volume )
@@ -526,7 +477,7 @@ bool setPlaybackVolume( const float volume )
         pulseAudioPointers.context,
         pulseAudioData.defaultSinkOutputDeviceId.c_str(),
         &pulseVolume,
-        setPlaybackVolumeCallback,
+        successCallback,
         &success );
 
     customPulseLoop();
@@ -534,26 +485,6 @@ bool setPlaybackVolume( const float volume )
     LOG( DEBUG ) << "setPlaybackVolume done with 'success': " << success;
 
     return success;
-}
-
-void setMicVolumeCallback( pa_context* c, int success, void* userdata )
-{
-    LOG( DEBUG ) << "setMicVolumeCallback called with 'success': " << success;
-
-    UNREFERENCED_PARAMETER( c );
-
-    if ( success )
-    {
-        *static_cast<bool*>( userdata ) = true;
-    }
-    else
-    {
-        LOG( ERROR ) << "Error setting mic volume status.";
-    }
-
-    loopControl = PulseAudioLoopControl::Stop;
-
-    LOG( DEBUG ) << "setMicVolumeCallback done.";
 }
 
 bool setMicrophoneVolume( const float volume )
@@ -572,7 +503,7 @@ bool setMicrophoneVolume( const float volume )
         pulseAudioPointers.context,
         pulseAudioData.defaultSourceInputDeviceId.c_str(),
         &pulseVolume,
-        setMicVolumeCallback,
+        successCallback,
         &success );
 
     customPulseLoop();
@@ -580,25 +511,6 @@ bool setMicrophoneVolume( const float volume )
     LOG( DEBUG ) << "setMicrophoneVolume done with 'success': " << success;
 
     return success;
-}
-
-void micMuteStatusCallback( pa_context* c, int success, void* userdata )
-{
-    LOG( DEBUG ) << "micMuteStatusCallback called with 'success': " << success;
-
-    UNREFERENCED_PARAMETER( c );
-    if ( success )
-    {
-        *static_cast<bool*>( userdata ) = true;
-    }
-    else
-    {
-        LOG( ERROR ) << "Error setting mic mute status.";
-    }
-
-    loopControl = PulseAudioLoopControl::Stop;
-
-    LOG( DEBUG ) << "micMuteStatusCallback done.";
 }
 
 bool setMicMuteState( const bool muted )
@@ -610,7 +522,7 @@ bool setMicMuteState( const bool muted )
         pulseAudioPointers.context,
         pulseAudioData.defaultSourceInputDeviceId.c_str(),
         muted,
-        micMuteStatusCallback,
+        successCallback,
         &success );
 
     customPulseLoop();
