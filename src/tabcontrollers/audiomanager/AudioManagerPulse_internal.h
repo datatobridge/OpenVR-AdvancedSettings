@@ -129,14 +129,11 @@ std::string getDeviceName( pa_proplist* p )
     std::string s;
     s.assign( pa_proplist_gets( p, deviceDescription ) );
 
-    LOG( DEBUG ) << "getDeviceName done with: " << s;
     return s;
 }
 
 template <class T> void deviceCallback( const T* i, const int isLast )
 {
-    LOG( DEBUG ) << "deviceCallback called with 'T': " << typeid( T ).name();
-
     static_assert(
         std::is_same<pa_source_info, T>::value
             || std::is_same<pa_sink_info, T>::value,
@@ -177,8 +174,6 @@ template <class T> void deviceCallback( const T* i, const int isLast )
         pulseAudioData.sinkOutputDevices.push_back(
             AudioDevice( i->name, getDeviceName( i->proplist ) ) );
     }
-
-    LOG( DEBUG ) << "deviceCallback done with: " << i->name;
 }
 
 void setInputDevicesCallback( pa_context* c,
@@ -224,10 +219,10 @@ void getDefaultDevicesCallback( pa_context* c,
 
     loopControl = PulseAudioLoopControl::Stop;
 
-    LOG( DEBUG ) << "getDefaultDevicesCallback done with sink output devices: "
+    LOG( DEBUG ) << "getDefaultDevicesCallback done with sink output device: '"
                  << pulseAudioData.defaultSinkOutputDeviceId
-                 << " and source input "
-                 << pulseAudioData.defaultSourceInputDeviceId;
+                 << "' and source input '"
+                 << pulseAudioData.defaultSourceInputDeviceId << "'.";
 }
 
 void stateCallbackFunction( pa_context* c, void* userdata )
@@ -396,8 +391,6 @@ bool isMicrophoneValid()
 
     const auto valid = pulseAudioData.defaultSourceInputDeviceId != "";
 
-    LOG( DEBUG ) << "isMicrophoneValid done with: " << valid;
-
     return valid;
 }
 
@@ -408,17 +401,12 @@ float getMicrophoneVolume()
     const auto linearVolume = pa_sw_volume_to_linear(
         pa_cvolume_avg( &pulseAudioData.currentDefaultSourceInfo.volume ) );
 
-    LOG( DEBUG ) << "getMicrophoneVolume done with: " << linearVolume;
-
     return static_cast<float>( linearVolume );
 }
 
 bool getMicrophoneMuted()
 {
     updateAllPulseData();
-
-    LOG( DEBUG ) << "getMicrophoneMuted done with: "
-                 << pulseAudioData.currentDefaultSourceInfo.mute;
 
     return pulseAudioData.currentDefaultSourceInfo.mute;
 }
