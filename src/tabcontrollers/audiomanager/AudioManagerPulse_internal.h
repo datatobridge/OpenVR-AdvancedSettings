@@ -362,10 +362,10 @@ std::string getCurrentDefaultRecordingDeviceId()
 {
     updateAllPulseData();
 
-    return pulseAudioData.defaultSourceInputDeviceId;
-
     LOG( DEBUG ) << "getCurrentDefaultRecordingDeviceId done with "
                  << pulseAudioData.defaultSourceInputDeviceId;
+
+    return pulseAudioData.defaultSourceInputDeviceId;
 }
 
 std::vector<AudioDevice> returnRecordingDevices()
