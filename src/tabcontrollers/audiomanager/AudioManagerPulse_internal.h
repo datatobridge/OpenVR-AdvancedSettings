@@ -66,12 +66,16 @@ void customPulseLoop()
 // Error function
 void dumpPulseAudioState()
 {
+    LOG( ERROR ) << "____";
+
     LOG( ERROR ) << "Dumping PulseAudio state: ";
     LOG( ERROR ) << "mainLoop: " << pulseAudioPointers.mainLoop;
     LOG( ERROR ) << "api: " << pulseAudioPointers.api;
     LOG( ERROR ) << "context: " << pulseAudioPointers.context;
 
     LOG( ERROR ) << "sinkOutputDevices: ";
+    LOG_IF( pulseAudioData.sinkOutputDevices.size() == 0, ERROR )
+        << "Output devices size zero.";
     for ( const auto& device : pulseAudioData.sinkOutputDevices )
     {
         LOG( ERROR ) << "\tDevice Name: " << device.name();
@@ -79,11 +83,15 @@ void dumpPulseAudioState()
     }
 
     LOG( ERROR ) << "sourceInputDevices: ";
+    LOG_IF( pulseAudioData.sourceInputDevices.size() == 0, ERROR )
+        << "Input devices size zero.";
     for ( const auto& device : pulseAudioData.sourceInputDevices )
     {
         LOG( ERROR ) << "\tDevice Name: " << device.name();
         LOG( ERROR ) << "\tDevice Id: " << device.id();
     }
+
+    LOG( ERROR ) << "____";
 }
 
 PulseAudioIsLastMeaning getIsLastMeaning( const int isLast ) noexcept
@@ -438,6 +446,9 @@ void sourceOutputCallback( pa_context* c,
     const auto sourceOutputIndex = i->index;
     const auto sourceIndex = pulseAudioData.currentDefaultSourceInfo.index;
     auto success = false;
+    LOG( DEBUG ) << "Attempting to move sourceOutputIndex: '"
+                 << sourceOutputIndex << "' to sourceIndex '" << sourceIndex
+                 << "'.";
     pa_context_move_source_output_by_index(
         c, sourceIndex, sourceOutputIndex, successCallback, &success );
 
@@ -445,6 +456,10 @@ void sourceOutputCallback( pa_context* c,
     {
         LOG( DEBUG ) << "Non-successful sourceOutputCallback operation.";
         LOG( DEBUG ) << "Name of i: " << i->name;
+        LOG( DEBUG ) << "Index of i: " << i->index;
+        LOG( DEBUG ) << "Owner module of i: " << i->owner_module;
+        LOG( DEBUG ) << "Client of i: " << i->client;
+        LOG( DEBUG ) << "Source of i: " << i->source;
     }
 }
 
