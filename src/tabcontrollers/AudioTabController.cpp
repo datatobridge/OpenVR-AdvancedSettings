@@ -457,29 +457,51 @@ int AudioTabController::getPlaybackDeviceCount()
     return static_cast<int>( m_playbackDevices.size() );
 }
 
+bool indexIsValid( const int index,
+                   const std::vector<AudioDevice>& devices,
+                   const std::string& functionName ) noexcept
+{
+    if ( index < 0 )
+    {
+        LOG( ERROR ) << functionName
+                     << " called with index below zero: " << index;
+        return false;
+    }
+
+    if ( static_cast<size_t>( index ) >= devices.size() )
+    {
+        LOG( ERROR ) << functionName
+                     << " called with index greater than size of "
+                        "devices '"
+                     << devices.size() << "', index '" << index << "'.";
+        return false;
+    }
+
+    return true;
+}
+
 QString AudioTabController::getPlaybackDeviceName( int index )
 {
-    if ( index >= 0 && static_cast<size_t>( index ) < m_playbackDevices.size() )
+    if ( indexIsValid( index, m_playbackDevices, "getPlaybackDeviceName" ) )
     {
         return QString::fromStdString(
-            m_playbackDevices[static_cast<size_t>( index )].name() );
+            m_playbackDevices.at( static_cast<size_t>( index ) ).name() );
     }
     else
     {
-        return "<ERROR>";
+        return "<PBN:ERROR>";
     }
 }
 
 std::string AudioTabController::getPlaybackDeviceID( int index )
 {
-    if ( index >= 0 && static_cast<size_t>( index ) < m_playbackDevices.size() )
+    if ( indexIsValid( index, m_playbackDevices, "getPlaybackDeviceID" ) )
     {
-        return m_playbackDevices[static_cast<size_t>( index )].id();
+        return m_playbackDevices.at( static_cast<size_t>( index ) ).id();
     }
     else
     {
-        LOG( ERROR ) << "Playback Device does not have a unique id";
-        return "<ERROR>";
+        return "<PBI:ERROR>";
     }
 }
 
@@ -495,27 +517,26 @@ int AudioTabController::getRecordingDeviceCount()
 
 std::string AudioTabController::getRecordingDeviceID( int index )
 {
-    if ( index >= 0 && static_cast<size_t>( index ) < m_playbackDevices.size() )
+    if ( indexIsValid( index, m_recordingDevices, "getRecordingDeviceID" ) )
     {
-        return m_recordingDevices[static_cast<size_t>( index )].id();
+        return m_recordingDevices.at( static_cast<size_t>( index ) ).id();
     }
     else
     {
-        LOG( ERROR ) << "Recording Device does not have a unique id";
-        return "<ERROR>";
+        return "<RCI:ERROR>";
     }
 }
 
 QString AudioTabController::getRecordingDeviceName( int index )
 {
-    if ( index >= 0 && static_cast<size_t>( index ) < m_playbackDevices.size() )
+    if ( indexIsValid( index, m_recordingDevices, "getRecordingDeviceName" ) )
     {
         return QString::fromStdString(
-            m_recordingDevices[static_cast<size_t>( index )].name() );
+            m_recordingDevices.at( static_cast<size_t>( index ) ).name() );
     }
     else
     {
-        return "<ERROR>";
+        return "<RCN:ERROR>";
     }
 }
 
