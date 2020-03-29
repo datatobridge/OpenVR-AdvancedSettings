@@ -437,8 +437,15 @@ void sourceOutputCallback( pa_context* c,
 
     const auto sourceOutputIndex = i->index;
     const auto sourceIndex = pulseAudioData.currentDefaultSourceInfo.index;
+    auto success = false;
     pa_context_move_source_output_by_index(
-        c, sourceIndex, sourceOutputIndex, successCallback, nullptr );
+        c, sourceIndex, sourceOutputIndex, successCallback, &success );
+
+    if ( !success )
+    {
+        LOG( DEBUG ) << "Non-successful sourceOutputCallback operation.";
+        LOG( DEBUG ) << "Name of i: " << i->name;
+    }
 }
 
 void setMicrophoneDevice( const std::string& id )
