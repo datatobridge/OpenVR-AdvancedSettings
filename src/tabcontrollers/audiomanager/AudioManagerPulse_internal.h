@@ -438,7 +438,7 @@ void sourceOutputCallback( pa_context* c,
                  << sourceOutputIndex << "' to sourceIndex '" << sourceIndex
                  << "'.";
     pa_context_move_source_output_by_index(
-        c, sourceIndex, sourceOutputIndex, successCallback, &success );
+        c, sourceOutputIndex, sourceIndex, successCallback, &success );
 
     if ( !success )
     {
