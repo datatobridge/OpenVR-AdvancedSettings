@@ -75,9 +75,24 @@ void dumpPulseAudioState()
 
     LOG( ERROR ) << "";
 
+    LOG( ERROR ) << "Data:";
+    LOG( ERROR ) << "\tdefaultSinkOutputDeviceId: "
+                 << pulseAudioData.defaultSinkOutputDeviceId;
+    LOG( ERROR ) << "\tdefaultSourceInputDeviceId: "
+                 << pulseAudioData.defaultSourceInputDeviceId;
+
+    LOG( ERROR ) << "";
+
+    LOG( ERROR ) << "\tcurrentDefaultSinkInfo name: "
+                 << pulseAudioData.currentDefaultSinkInfo.name;
+    LOG( ERROR ) << "\tcurrentDefaultSourceInfo name: "
+                 << pulseAudioData.currentDefaultSourceInfo.name;
+
+    LOG( ERROR ) << "";
+
     LOG( ERROR ) << "sinkOutputDevices: ";
     LOG_IF( pulseAudioData.sinkOutputDevices.size() == 0, ERROR )
-        << "Output devices size zero.";
+        << "\tOutput devices size zero.";
     for ( const auto& device : pulseAudioData.sinkOutputDevices )
     {
         LOG( ERROR ) << "\tDevice Name: " << device.name();
