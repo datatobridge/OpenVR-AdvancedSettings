@@ -483,12 +483,12 @@ void sourceOutputCallback( pa_context* c,
 
     if ( !success )
     {
-        LOG( DEBUG ) << "Unsuccessful sourceOutputCallback operation.";
-        LOG( DEBUG ) << "\tName of i: " << i->name;
-        LOG( DEBUG ) << "\tIndex of i: " << i->index;
-        LOG( DEBUG ) << "\tOwner module of i: " << i->owner_module;
-        LOG( DEBUG ) << "\tClient of i: " << i->client;
-        LOG( DEBUG ) << "\tSource of i: " << i->source;
+        LOG( ERROR ) << "Unsuccessful sourceOutputCallback operation.";
+        LOG( ERROR ) << "\tName of i: " << i->name;
+        LOG( ERROR ) << "\tIndex of i: " << i->index;
+        LOG( ERROR ) << "\tOwner module of i: " << i->owner_module;
+        LOG( ERROR ) << "\tClient of i: " << i->client;
+        LOG( ERROR ) << "\tSource of i: " << i->source;
     }
 }
 
