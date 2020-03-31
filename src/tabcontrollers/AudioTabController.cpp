@@ -653,6 +653,7 @@ void AudioTabController::setMicDeviceIndex( int index, bool notify )
             // code to just change Mic
             audioManager->setMicDevice(
                 m_recordingDevices[static_cast<size_t>( index )].id(), notify );
+            m_recordingDeviceIndex = index;
             if ( tempProx )
             {
                 setMicProximitySensorCanMute( true );
