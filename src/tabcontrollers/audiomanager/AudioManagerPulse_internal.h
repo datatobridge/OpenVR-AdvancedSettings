@@ -463,14 +463,21 @@ void setMicrophoneDevice( const std::string& id )
 
     updateAllPulseData();
 
+    auto success = false;
     pa_context_set_default_source(
-        pulseAudioPointers.context, id.c_str(), successCallback, nullptr );
+        pulseAudioPointers.context, id.c_str(), successCallback, &success );
 
     customPulseLoop();
 
-    constexpr auto noUserData = nullptr;
-    pa_context_get_source_output_info_list(
-        pulseAudioPointers.context, sourceOutputCallback, noUserData );
+    if ( !success )
+    {
+        LOG( ERROR ) << "Error setting microphone device for '" << id << "'.";
+    }
+
+    constexpr auto errorHandledInCallback = nullptr;
+    pa_context_get_source_output_info_list( pulseAudioPointers.context,
+                                            sourceOutputCallback,
+                                            errorHandledInCallback );
 
     customPulseLoop();
 
