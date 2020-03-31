@@ -311,10 +311,18 @@ void setPlaybackDeviceInternal( const std::string& id )
 {
     updateAllPulseData();
 
+    auto success = false;
     pa_context_set_default_sink(
-        pulseAudioPointers.context, id.c_str(), successCallback, nullptr );
+        pulseAudioPointers.context, id.c_str(), successCallback, &success );
 
     customPulseLoop();
+
+    if ( !success )
+    {
+        LOG( ERROR ) << "setPlaybackDeviceInternal failed to set default sink "
+                        "for device '"
+                     << id << "'.";
+    }
 
     LOG( DEBUG ) << "setPlaybackDeviceInternal done with id: " << id;
 }
