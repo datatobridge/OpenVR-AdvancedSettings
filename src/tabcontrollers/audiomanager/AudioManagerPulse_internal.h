@@ -286,6 +286,11 @@ void updateAllPulseData()
 {
     constexpr auto noCustomUserdata = nullptr;
 
+    pa_context_get_server_info( pulseAudioPointers.context,
+                                getDefaultDevicesCallback,
+                                noCustomUserdata );
+    customPulseLoop();
+
     pulseAudioData.sinkOutputDevices.clear();
     pa_context_get_sink_info_list( pulseAudioPointers.context,
                                    setOutputDevicesCallback,
@@ -295,11 +300,6 @@ void updateAllPulseData()
     pulseAudioData.sourceInputDevices.clear();
     pa_context_get_source_info_list(
         pulseAudioPointers.context, setInputDevicesCallback, noCustomUserdata );
-    customPulseLoop();
-
-    pa_context_get_server_info( pulseAudioPointers.context,
-                                getDefaultDevicesCallback,
-                                noCustomUserdata );
     customPulseLoop();
 
     LOG( DEBUG ) << "updateAllPulseData done.";
