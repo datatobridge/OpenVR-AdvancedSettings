@@ -522,8 +522,8 @@ bool setPlaybackVolume( const float volume )
 
     if ( !success )
     {
-        LOG( ERROR ) << "setPlaybackVolume failed to set volume '"
-                     << volume "' for device '"
+        LOG( ERROR ) << "setPlaybackVolume failed to set volume '" << volume
+                     << "' for device '"
                      << pulseAudioData.defaultSinkOutputDeviceId << "'.";
     }
 
