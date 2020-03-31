@@ -538,6 +538,13 @@ bool setMicrophoneVolume( const float volume )
 
     customPulseLoop();
 
+    if ( !success )
+    {
+        LOG( ERROR ) << "seMicrophoneVolume failed to set volume '" << volume
+                     << "' for device '"
+                     << pulseAudioData.defaultSourceInputDeviceId << "'.";
+    }
+
     LOG( DEBUG ) << "setMicrophoneVolume done with 'success': " << success;
 
     return success;
