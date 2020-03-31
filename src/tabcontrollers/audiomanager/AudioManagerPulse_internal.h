@@ -564,6 +564,13 @@ bool setMicMuteState( const bool muted )
 
     customPulseLoop();
 
+    if ( !success )
+    {
+        LOG( ERROR ) << "setMicMuteState failed to set muted '" << muted
+                     << "' for device '"
+                     << pulseAudioData.defaultSourceInputDeviceId << "'.";
+    }
+
     LOG( DEBUG ) << "setMicMuteState done with 'success': " << success;
 
     return success;
