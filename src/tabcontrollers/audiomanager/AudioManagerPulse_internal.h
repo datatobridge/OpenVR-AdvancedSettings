@@ -73,6 +73,8 @@ void dumpPulseAudioState()
     LOG( ERROR ) << "api: " << pulseAudioPointers.api;
     LOG( ERROR ) << "context: " << pulseAudioPointers.context;
 
+    LOG( ERROR ) << "";
+
     LOG( ERROR ) << "sinkOutputDevices: ";
     LOG_IF( pulseAudioData.sinkOutputDevices.size() == 0, ERROR )
         << "Output devices size zero.";
@@ -82,9 +84,11 @@ void dumpPulseAudioState()
         LOG( ERROR ) << "\tDevice Id: " << device.id();
     }
 
+    LOG( ERROR ) << "";
+
     LOG( ERROR ) << "sourceInputDevices: ";
     LOG_IF( pulseAudioData.sourceInputDevices.size() == 0, ERROR )
-        << "Input devices size zero.";
+        << "\tInput devices size zero.";
     for ( const auto& device : pulseAudioData.sourceInputDevices )
     {
         LOG( ERROR ) << "\tDevice Name: " << device.name();
