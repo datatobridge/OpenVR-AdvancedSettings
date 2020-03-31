@@ -443,7 +443,7 @@ void sourceOutputCallback( pa_context* c,
         return;
     }
 
-    const auto doNotMoveSourceOutput = i->name == "Peak detect";
+    const auto doNotMoveSourceOutput = std::string( i->name ) == "Peak detect";
     if ( doNotMoveSourceOutput )
     {
         LOG( DEBUG ) << "Returning early due to Peak detect name.";
