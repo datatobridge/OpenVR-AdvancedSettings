@@ -216,8 +216,8 @@ void getDefaultDevicesCallback( pa_context* c,
     if ( !i )
     {
         LOG( ERROR ) << "i == 0";
-        pulseAudioData.defaultSinkOutputDeviceId = "";
-        pulseAudioData.defaultSourceInputDeviceId = "";
+        pulseAudioData.defaultSinkOutputDeviceId = "DDO:ERROR";
+        pulseAudioData.defaultSourceInputDeviceId = "DDI:ERROR";
         return;
     }
 
