@@ -516,6 +516,8 @@ void setMicrophoneDevice( const std::string& id )
 
     customPulseLoop();
 
+    updateAllPulseData();
+
     LOG( DEBUG ) << "setMicrophoneDevice done.";
 }
 
