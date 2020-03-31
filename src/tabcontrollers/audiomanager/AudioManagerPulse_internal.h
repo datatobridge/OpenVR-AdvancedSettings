@@ -440,6 +440,8 @@ void sourceOutputCallback( pa_context* c,
     pa_context_move_source_output_by_index(
         c, sourceOutputIndex, sourceIndex, successCallback, &success );
 
+    customPulseLoop();
+
     if ( !success )
     {
         LOG( DEBUG ) << "Non-successful sourceOutputCallback operation.";
