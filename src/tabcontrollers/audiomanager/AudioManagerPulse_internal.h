@@ -160,6 +160,8 @@ template <class T> void deviceCallback( const T* i, const int isLast )
             pulseAudioData.currentDefaultSourceInfo = *i;
         }
 
+        LOG( DEBUG ) << "Adding device to input: '" << i->name << "', '"
+                     << getDeviceName( i->proplist ) << "'.";
         pulseAudioData.sourceInputDevices.push_back(
             AudioDevice( i->name, getDeviceName( i->proplist ) ) );
     }
@@ -171,6 +173,8 @@ template <class T> void deviceCallback( const T* i, const int isLast )
             pulseAudioData.currentDefaultSinkInfo = *i;
         }
 
+        LOG( DEBUG ) << "Adding device to output: '" << i->name << "', '"
+                     << getDeviceName( i->proplist ) << "'.";
         pulseAudioData.sinkOutputDevices.push_back(
             AudioDevice( i->name, getDeviceName( i->proplist ) ) );
     }
