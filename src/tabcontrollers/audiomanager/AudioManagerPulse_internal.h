@@ -462,10 +462,6 @@ void sourceOutputCallback( pa_context* c,
         return;
     }
 
-    LOG( DEBUG ) << "Attempting to move source output index: '" << i->index
-                 << "' with name '" << i->name << "' to source index: '"
-                 << pulseAudioData.currentDefaultSourceInfo.index << "'.";
-
     const auto doNotMoveSourceOutput = std::string( i->name ) == "Peak detect";
     if ( doNotMoveSourceOutput )
     {
@@ -477,7 +473,7 @@ void sourceOutputCallback( pa_context* c,
     auto success = false;
     LOG( DEBUG ) << "Attempting to move sourceOutputIndex: '"
                  << sourceOutputIndex << "' to sourceIndex '" << sourceIndex
-                 << "'.";
+                 << "' with source output name " << i->name << ".";
     pa_context_move_source_output_by_index(
         c, sourceOutputIndex, sourceIndex, successCallback, &success );
 
