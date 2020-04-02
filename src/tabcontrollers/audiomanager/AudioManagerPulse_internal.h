@@ -505,6 +505,8 @@ void setMicrophoneDevice( const std::string& id )
         LOG( ERROR ) << "Error setting microphone device for '" << id << "'.";
     }
 
+    updateAllPulseData();
+
     constexpr auto errorHandledInCallback = nullptr;
     pa_context_get_source_output_info_list( pulseAudioPointers.context,
                                             sourceOutputCallback,
